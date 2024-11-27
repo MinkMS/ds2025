@@ -1,0 +1,107 @@
+\documentclass[a4paper,12pt]{article}
+
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{hyperref}
+
+\title{Practical Work 1: TCP File Transfer}
+\author{Do Ba Hoang Minh - 22BI13278}
+\date{26/11/2024}
+
+\begin{document}
+
+\maketitle
+
+\section*{Goal}
+The objective of this project is to implement a file transfer system over TCP/IP using socket programming. The system includes:
+\begin{itemize}
+    \item A server that receives the file and saves it.
+    \item A client that sends the file to the server.
+    \item Communication via TCP sockets.
+\end{itemize}
+
+\section*{Protocol Design}
+The protocol utilizes TCP (Transmission Control Protocol), which ensures reliable and ordered communication. The flow is as follows:
+\begin{itemize}
+    \item The server initializes a socket, binds to a port, and listens for incoming connections.
+    \item The client connects to the server and sends file data in chunks.
+    \item The server receives the data and writes it to a file on disk.
+    \item Both client and server close the connection upon completion.
+\end{itemize}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{tcp_flow_diagram.png} % Replace with your actual diagram.
+    \caption{TCP File Transfer Protocol Flow}
+\end{figure}
+
+\section*{System Organization}
+The system consists of two components:
+\begin{itemize}
+    \item **Server**: A Python script that listens for connections and receives files.
+    \item **Client**: A Python script that reads a file and sends it to the server.
+\end{itemize}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{system_organization.png} % Replace with your actual diagram.
+    \caption{System Organization Diagram}
+\end{figure}
+
+\section*{Implementation}
+The implementation is done in Python, with separate scripts for the server and client.
+
+\subsection*{Server Code}
+Below is the server implementation:
+\begin{lstlisting}[language=Python, caption=Server Code: tcp_file_server.py]
+import socket
+
+def start_server(host='127.0.0.1', port=65432, output_file='received_file.txt'):
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.bind((host, port))
+    server_socket.listen(1)
+
+    print(f"Server listening on {host}:{port}...")
+
+    conn, addr = server_socket.accept()
+    print(f"Connected by {addr}")
+
+    with open(output_file, 'wb') as file:
+        while True:
+            data = conn.recv(1024)
+            if not data:  # Connection closed
+                break
+            file.write(data)
+
+    print(f"File received and saved as {output_file}.")
+    conn.close()
+    server_socket.close()
+
+if __name__ == "__main__":
+    start_server()
+\end{lstlisting}
+
+\subsection*{Client Code}
+Below is the client implementation:
+\begin{lstlisting}[language=Python, caption=Client Code: tcp_file_client.py]
+import socket
+
+def send_file(file_path, host='127.0.0.1', port=65432):
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect((host, port))
+
+    with open(file_path, 'rb') as file:
+        while (chunk := file.read(1024)):
+            client_socket.sendall(chunk)
+
+    print(f"File {file_path} has been sent to the server.")
+    client_socket.close()
+
+if __name__ == "__main__":
+    send_file('file_to_send.txt')  # Replace with the actual file you want to send
+\end{lstlisting}
+
+\section*{Conclusion}
+This project successfully demonstrated file transfer over TCP using Python. It showcased the reliable nature of TCP and provided practical experience in socket programming.
+
+\end{document}
