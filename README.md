@@ -9,6 +9,6 @@ Students are expected to:
 Student Info
 =========================
 
-* Student Name: Phan Đăng Nhân
-* Student ID: BI12-336
+* Student Name: Đỗ Bá Hoàng Minh
+* Student ID: 22BI13278
 * Student Group ID: 14
